@@ -1,5 +1,5 @@
 import os
-dp = 'MIFS'
+dp = '/mnt/hdd1/lorra/mifs_cropped_112_96/'
 at = open('at_pairs_428.txt', 'w+')
 bt = open('bt_pairs_428.txt', 'w+')
 ab = open('ab_pairs_428.txt', 'w+')
