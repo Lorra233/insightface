@@ -40,7 +40,7 @@ def get_paths(mifs_dir, pairs, file_ext):
 
 parser = argparse.ArgumentParser(description='Package MIFS images')
 # general
-parser.add_argument('--data-dir', default='/mnt/hdd1/lorra/mifs_cropped_112_96/', help='')
+parser.add_argument('--data-dir', default='/mnt/hdd1/lorra/MIFS-cropped/', help='')
 parser.add_argument('--image-size', type=str, default='112,96', help='')
 parser.add_argument('--output', default='all_mifs.bin', help='path to save.')
 args = parser.parse_args()
