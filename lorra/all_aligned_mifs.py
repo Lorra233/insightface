@@ -3,8 +3,10 @@ import os
 import shutil
 import re
 #把mtcnn对齐好的所有按人名文件夹存放的照片，都扔到一个新文件夹里
-path = '/mnt/hdd1/lorra/mtcnn_mifs_160'
-new_dir = '/mnt/hdd1/lorra/mtcnn_mifs_oned'
+path = '/mnt/hdd1/lorra/mtcnn_mifs_112'
+new_dir = '/mnt/hdd1/lorra/112_tgt_mifs'
+if not os.path.exists(new_dir):
+    os.makedirs(new_dir)
 dirr = os.listdir(path)
 # print dirr,'\n\n'
 i=0

@@ -38,6 +38,7 @@ import sklearn
 import cv2
 import math
 import datetime
+import time
 import pickle
 from sklearn.decomposition import PCA
 import mxnet as mx
@@ -141,6 +142,7 @@ def calculate_val(thresholds, embeddings1, embeddings2, actual_issame, far_targe
       
         # Find the threshold that gives FAR = far_target
         far_train = np.zeros(nrof_thresholds)
+        # print(train_set,actual_issame[train_set])
         for threshold_idx, threshold in enumerate(thresholds):
             _, far_train[threshold_idx] = calculate_val_far(threshold, dist[train_set], actual_issame[train_set])
         if np.max(far_train)>=far_target:
@@ -164,9 +166,16 @@ def calculate_val_far(threshold, dist, actual_issame):
     n_same = np.sum(actual_issame)
     n_diff = np.sum(np.logical_not(actual_issame))
     #print(true_accept, false_accept)
-    #print(n_same, n_diff)
-    val = float(true_accept) / float(n_same)
-    far = float(false_accept) / float(n_diff)
+    # print(n_same, n_diff)
+    # print(n_diff,n_same)
+    if n_same:
+        val = float(true_accept) / float(n_same)
+    else:
+        val = float(true_accept)
+    if n_diff:
+        far = float(false_accept) / float(n_diff)
+    else:
+        far = float(false_accept)
     return val, far
 
 def evaluate(embeddings, actual_issame, nrof_folds=10, pca = 0):
@@ -206,6 +215,7 @@ def test(data_set, mx_model, batch_size, nfolds=10, data_extra = None, label_sha
   print('testing verification..')
   data_list = data_set[0]
   issame_list = data_set[1]
+  # print(issame_list)
   model = mx_model
   embeddings_list = []
   if data_extra is not None:
@@ -508,7 +518,7 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='do verification')
   # general
   parser.add_argument('--data-dir', default='', help='')
-  parser.add_argument('--model', default='../model/softmax,50', help='path to load model.')
+  parser.add_argument('--model', default='../models/model-r100-arcface-ms1m-refine-v2/model-r100-ii/model', help='path to load model.')
   parser.add_argument('--target', default='lfw,cfp_ff,cfp_fp,agedb_30', help='test targets.')
   parser.add_argument('--gpu', default=0, type=int, help='gpu id')
   parser.add_argument('--batch-size', default=32, type=int, help='')
@@ -545,6 +555,7 @@ if __name__ == '__main__':
     epochs = [int(x) for x in vec[1].split('|')]
   print('model number', len(epochs))
   time0 = datetime.datetime.now()
+  print('epoches:',epochs)
   for epoch in epochs:
     print('loading',prefix, epoch)
     sym, arg_params, aux_params = mx.model.load_checkpoint(prefix, epoch)
@@ -552,6 +563,7 @@ if __name__ == '__main__':
     all_layers = sym.get_internals()
     sym = all_layers['fc1_output']
     model = mx.mod.Module(symbol=sym, context=ctx, label_names = None)
+    time.sleep(5)
     #model.bind(data_shapes=[('data', (args.batch_size, 3, image_size[0], image_size[1]))], label_shapes=[('softmax_label', (args.batch_size,))])
     model.bind(data_shapes=[('data', (args.batch_size, 3, image_size[0], image_size[1]))])
     model.set_params(arg_params, aux_params)
@@ -569,7 +581,8 @@ if __name__ == '__main__':
       data_set = load_bin(path, image_size)
       ver_list.append(data_set)
       ver_name_list.append(name)
-
+  # print(ver_list)
+  # print('888888888', len(ver_list))
   if args.mode==0:
     for i in xrange(len(ver_list)):
       results = []
